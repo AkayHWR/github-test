@@ -29,12 +29,6 @@
 
 ## ── PHASE 1: IMPORTS & ÜBERBLICK (ca. 1 Minute) ────────────────────
 
-*Zeige die Import-Zelle (erste Code-Zelle).*
-
-> „Ganz oben stehen alle Imports — ich habe sie in drei Gruppen kommentiert:
-> pandas und numpy für die Datenarbeit, sklearn für die Modellierung, und matplotlib plus seaborn für Visualisierungen.
-> Das ist bewusst so sortiert, damit man auf einen Blick sieht, was gebraucht wird — ohne die Imports einzeln zu suchen."
-
 *Scrolle zur ersten Markdown-Zelle.*
 
 > „Die erste Markdown-Zelle beschreibt das Gesamtziel:
@@ -45,6 +39,12 @@
 > „Der Aufbau meiner Lösung folgt genau der Aufgabenstellung:
 > Daten laden und verstehen, Typen definieren, Fehlende Werte behandeln,
 > Populationsstabilität prüfen, zwei Modelle bauen, und die Ergebnisse vergleichen."
+
+*Zeige die Import-Zelle (erste Code-Zelle).*
+
+> „Ganz oben stehen alle Imports — ich habe sie in drei Gruppen kommentiert:
+> pandas und numpy für die Datenarbeit, sklearn für die Modellierung, und matplotlib plus seaborn für Visualisierungen.
+> Das ist bewusst so sortiert, damit man auf einen Blick sieht, was gebraucht wird — ohne die Imports einzeln zu suchen."
 
 ---
 

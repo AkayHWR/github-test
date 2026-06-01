@@ -34,11 +34,10 @@
 > „Die erste Markdown-Zelle beschreibt das Gesamtziel:
 > Wir haben einen Datensatz zu Hauskrediten — sogenannte Home Equity Loans —
 > und wollen vorhersagen, ob ein Kreditnehmer ausfällt oder nicht.
-> Das ist klassisches Credit Risk Modeling, wie es in der Praxis auch bei S-Kreditpartner relevant ist."
 
 > „Der Aufbau meiner Lösung folgt genau der Aufgabenstellung:
-> Daten laden und verstehen, Typen definieren, Fehlende Werte behandeln,
-> Populationsstabilität prüfen, zwei Modelle bauen, und die Ergebnisse vergleichen."
+> Daten laden, Typen definieren, Fehlende Werte behandeln,
+> PSI prüfen, zwei Modelle bauen, und die Ergebnisse vergleichen."
 
 *Zeige die Import-Zelle (erste Code-Zelle).*
 
@@ -66,7 +65,6 @@
 
 > „Das info() zeigt uns den Rohzustand: fast alle Spalten sind noch als object oder float geladen,
 > und man sieht schon hier fehlende Werte — zum Beispiel hat DEBTINC nur 4836 von 6199 Einträgen.
-> Das heißt über 20% fehlende Werte in dieser Spalte — das muss ich später behandeln."
 
 [PAUSE — lass sie kurz schauen]
 
@@ -76,7 +74,7 @@
 
 *Scrolle zur Konvertierungs-Zelle.*
 
-> „Der nächste Schritt ist explizite Datentypkonvertierung — das ist wichtig, weil pandas alleine
+> „Der nächste Schritt ist Datentypkonvertierung — das ist wichtig, weil pandas alleine
 > nicht weiß, ob eine Spalte kategorisch ist oder numerisch. Wenn ich das nicht definiere,
 > behandelt es zum Beispiel JOB als einen beliebigen Text-String — was bei One-Hot-Encoding
 > zu falschen Ergebnissen führen würde."
@@ -91,7 +89,6 @@
 
 > „Beim Datum nutze ich errors='coerce' — das bedeutet: wenn ein Wert nicht als Datum parsebar ist,
 > wird er zu NaT, also einem leeren Datumswert, anstatt einen Fehler zu werfen.
-> Das ist defensive Programmierung — der Code bricht nicht bei schmutzigen Daten."
 
 *Zeige df.info() nach Konvertierung.*
 
@@ -110,8 +107,6 @@
 > „Jetzt trenne ich Zielvariable und Features sauber.
 > y ist das DEFAULT_FLAG — das ist das was wir vorhersagen wollen.
 > X sind alle anderen Spalten — das sind die Informationen, die das Modell nutzen darf.
-> Diese Trennung mache ich früh, damit in keinem späteren Schritt versehentlich
-> die Zielvariable ins Training einfließt."
 
 ---
 
@@ -120,22 +115,15 @@
 *Scrolle zur impute_categorical_missing()-Funktion.*
 
 > „Hier ist eine eigene Funktion, die ich gebaut habe. Die Aufgabe:
-> fehlende Werte in kategorischen Spalten ersetzen — aber nicht mit dem häufigsten Wert,
-> sondern mit einer neuen Kategorie namens 'MISSING'."
+> fehlende Werte in kategorischen Spalten ersetzen — mit einer neuen Kategorie namens 'MISSING'."
 
 > „Warum das? Weil 'Information fehlt' selbst eine Information sein kann.
 > Wenn jemand seinen Job nicht angibt, ist das vielleicht kein Zufall —
 > das könnte ein Muster sein, das mit Ausfallrisiko zusammenhängt.
-> Wenn ich einfach mit dem häufigsten Job auffülle, verliere ich dieses Signal."
-
-> „Technisch muss ich dabei aufpassen: bei category-dtype in pandas muss die neue Kategorie
-> erst explizit registriert werden — über cat.add_categories —
-> bevor ich fillna aufrufen kann. Sonst wirft pandas einen ValueError.
-> Das ist ein häufiger Fehler, den man kennen muss."
+> Wenn man einfach mit dem häufigsten Job auffüllt, verliert man dieses Signal."
 
 > „Die Funktion prüft außerdem über isinstance mit pd.CategoricalDtype,
-> ob eine Spalte wirklich kategorisch ist — und nicht einfach ein String.
-> Das ist robuster als dtype == 'object', weil category und object zwei verschiedene Typen sind."
+> ob eine Spalte wirklich kategorisch ist.
 
 *Zeige die Ausgabe nach der Funktion — X.info().*
 
@@ -178,11 +166,6 @@
 > der Kundenmix geändert hat — dann verliert das Modell genau dort seine Vorhersagekraft,
 > ohne dass man es merkt. PSI macht das sichtbar."
 
-> „Die Formel dahinter ist:
-> PSI = Summe über alle Bins von: (Anteil erwartet minus Anteil aktuell)
-> multipliziert mit dem natürlichen Logarithmus von (Anteil erwartet geteilt durch Anteil aktuell).
-> Das ergibt eine nicht-negative Zahl."
-
 > „Die Interpretation ist standardisiert:
 > Unter 0,1 — stabil, kein Handlungsbedarf.
 > Zwischen 0,1 und 0,2 — moderate Verschiebung, beobachten.
@@ -193,6 +176,7 @@
 > „Die Funktion behandelt numerische und kategorische Features unterschiedlich:
 > Bei numerischen Features schneide ich die Daten in Bins — Intervalle —
 > und vergleiche die Anteile pro Bin.
+> 
 > Bei kategorischen Features vergleiche ich direkt die Anteile pro Kategorie.
 > Für jedes Feature gibt es auch einen Plot — Trainingsdaten blau, APP-Daten orange —
 > damit man die Verschiebung visuell sieht."
@@ -226,7 +210,6 @@
 *Scrolle zur Pipeline-Zelle.*
 
 > „Jetzt bauen wir das erste Modell — und ich nutze dafür eine sklearn-Pipeline.
-> Das ist in der Praxis Standard, und aus gutem Grund."
 
 > „Der Hauptvorteil einer Pipeline: Vorverarbeitung und Modell sind eine Einheit.
 > Das verhindert Data Leakage — also den Fall, wo Testdaten die Vorverarbeitung beeinflussen.
@@ -262,7 +245,7 @@
 
 > „Zweitens der Klassifikator — LogisticRegression mit solver='liblinear'.
 > liblinear ist gut für kleinere Datensätze und unterstützt
-> sowohl L1- als auch L2-Regularisierung."
+> sowohl L1- als auch L2-Regularisierung. Außerdem war dies der einzig mir bekannte."
 
 ---
 
@@ -276,7 +259,6 @@
 > Für jedes Modell berechnet sie die ROC-Kurve und den AUC-Wert,
 > und trägt beides in einen gemeinsamen Plot ein."
 
-> „ROC steht für Receiver Operating Characteristic.
 > Die Kurve zeigt das Verhältnis zwischen True Positive Rate — also wie oft
 > echte Ausfälle erkannt werden — und False Positive Rate —
 > wie oft gute Kredite fälschlicherweise als Ausfall eingestuft werden.
@@ -286,7 +268,6 @@
 > „AUC ist die Fläche unter dieser Kurve.
 > Ein Wert von 0,5 bedeutet: das Modell ist so gut wie Münzwerfen — zufällig.
 > Ein Wert von 1,0 wäre perfekte Trennung.
-> In der Praxis gelten Werte über 0,7 als akzeptabel, über 0,8 als gut."
 
 > „Die gestrichelte Diagonale im Plot ist das Zufallsmodell — die Untergrenze.
 > Alles was oberhalb liegt ist besser als raten."
@@ -306,8 +287,7 @@
 *Zeige den ROC-Plot Logistische Regression.*
 
 > „Im Plot sieht man: der Trainings-AUC und der Test-AUC liegen nah beieinander.
-> Das ist ein gutes Zeichen — das Modell hat nicht einfach die Trainingsdaten auswendig gelernt,
-> sondern generalisiert auf neue Daten."
+> Das ist ein gutes Zeichen.
 
 ---
 
@@ -329,13 +309,6 @@
 > Aber auf den Testdaten fällt er stärker ab.
 > Das ist klassisches Overfitting — der Baum hat sich zu sehr an die Trainingsdaten angepasst."
 
-> „Die Logistische Regression ist auf Test stabiler — und das ist das was zählt.
-> In einem regulierten Umfeld wie dem Kreditrisiko ist außerdem Interpretierbarkeit
-> ein wichtiges Kriterium: man muss erklären können warum ein Kredit abgelehnt wird.
-> Bei Logistischer Regression kann ich die Koeffizienten direkt interpretieren —
-> bei einem Entscheidungsbaum ist das schon schwieriger, bei komplexeren Modellen wie
-> XGBoost noch viel mehr. Das nennt sich das Black-Box-Problem."
-
 ---
 
 ## ── PHASE 12: ABSCHLUSS (ca. 1 Minute) ─────────────────────────────
@@ -346,11 +319,10 @@
 
 > „Was ich als Stärken sehe:
 > Die Pipeline-Struktur sorgt für Sauberkeit und verhindert Data Leakage.
-> Die PSI-Analyse ist ein praxisnahes Instrument — genau das was in der Kreditrisikopraxis
-> zur Modellüberwachung genutzt wird.
-> Die ROC-Funktion ist generisch und wiederverwendbar."
+> Die ROC-Funktion ist generisch und wiederverwendbar.
+> Das Data Cleanen ist auf andere Datensätze ebenfalls anwendbar sobald man einmal die kategorischen und datenspalten definiert hat."
 
-> „Was ich verbessern würde, wenn ich mehr Zeit hätte:
+> „Was ich verbessern würde:
 > Erstens Kreuzvalidierung statt einfachem Split — das gibt robustere AUC-Schätzungen.
 > Zweitens class_weight='balanced' bei der Logistischen Regression,
 > weil Kreditausfälle typischerweise seltener sind als Nicht-Ausfälle —

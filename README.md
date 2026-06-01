@@ -211,12 +211,6 @@
 
 > „Jetzt bauen wir das erste Modell — und ich nutze dafür eine sklearn-Pipeline.
 
-> „Der Hauptvorteil einer Pipeline: Vorverarbeitung und Modell sind eine Einheit.
-> Das verhindert Data Leakage — also den Fall, wo Testdaten die Vorverarbeitung beeinflussen.
-> Wenn ich zum Beispiel den Scaler auf allen Daten fitteen würde — Training und Test zusammen —
-> dann hätte das Modell beim Testen indirekten Zugang zu Testinformationen.
-> Die Pipeline stellt sicher: fit() passiert nur auf Trainingsdaten."
-
 *Zeige numerical_transformer.*
 
 > „Die Pipeline hat zwei Hauptstufen.
